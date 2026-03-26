@@ -1,6 +1,61 @@
 import numpy as np
 import math
 
+
+def euler_to_quaternion(angle_x, angle_y, angle_z=0.0):
+    rx = math.radians(angle_x) / 2.0
+    ry = math.radians(angle_y) / 2.0
+    rz = math.radians(angle_z) / 2.0
+
+    cx, sx = math.cos(rx), math.sin(rx)
+    cy, sy = math.cos(ry), math.sin(ry)
+    cz, sz = math.cos(rz), math.sin(rz)
+
+    w = cx * cy * cz + sx * sy * sz
+    x = sx * cy * cz - cx * sy * sz
+    y = cx * sy * cz + sx * cy * sz
+    z = cx * cy * sz - sx * sy * cz
+    return np.array([w, x, y, z], dtype=np.float32)
+
+
+def slerp(q0, q1, t):
+    dot = np.dot(q0, q1)
+
+    # 确保走最短路径
+    if dot < 0.0:
+        q1 = -q1
+        dot = -dot
+
+    dot = min(dot, 1.0)
+
+    if dot > 0.9995:
+        result = q0 + t * (q1 - q0)
+        return result / np.linalg.norm(result)
+
+    theta_0 = math.acos(dot)
+    theta = theta_0 * t
+    sin_theta = math.sin(theta)
+    sin_theta_0 = math.sin(theta_0)
+
+    s0 = math.cos(theta) - dot * sin_theta / sin_theta_0
+    s1 = sin_theta / sin_theta_0
+
+    result = s0 * q0 + s1 * q1
+    return result / np.linalg.norm(result)
+
+
+def quaternion_to_model_matrix(q):
+    w, x, y, z = q
+
+    return np.array([
+        [1 - 2*(y*y + z*z),     2*(x*y - w*z),     2*(x*z + w*y), 0.0],
+        [    2*(x*y + w*z), 1 - 2*(x*x + z*z),     2*(y*z - w*x), 0.0],
+        [    2*(x*z - w*y),     2*(y*z + w*x), 1 - 2*(x*x + y*y), 0.0],
+        [              0.0,               0.0,               0.0,  1.0]
+    ], dtype=np.float32)
+
+
+
 def get_model_matrix_y(angle):
     rad = math.radians(angle)
     cos_a = math.cos(rad)
