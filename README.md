@@ -22,6 +22,12 @@ Work1 的拓展，将几何图元升级为三维正方体，实现完整的 MVP 
 
 **操作：** `A` / `D` 绕 Y 轴旋转，`W` / `S` 绕 X 轴旋转，`空格` 开关自动旋转，`I` 切换 SLERP 插值模式
 
+### Work2 - Bézier 曲线光栅化与交互绘制
+
+基于 Taichi GPU 内核与 NumPy 实现 Bézier 曲线的交互式绘制与光栅化。手动实现 De Casteljau 算法采样曲线，通过 batching 策略批量发往 GPU 并行写入显存。支持超采样反走样、控制点拖拽、Bézier Spline（Catmull-Rom 转换）插值，以及 De Casteljau 包络线动态可视化动画。
+
+**操作：** `鼠标左键` 添加/拖拽控制点，`鼠标右键` 切换 Bézier/Spline 模式，`空格` 开关反走样，`C` 清空画布
+
 ## 项目结构
 
 ```
@@ -35,10 +41,14 @@ CG-lab/
 │   │   ├── config.py   # 相机与投影参数配置
 │   │   ├── transform.py # MVP 矩阵实现
 │   │   └── main.py     # 变换管线与渲染
-│   └── Work1_pro/      # 3D 立方体线框渲染（选做拓展）
-│       ├── config.py   # 正方体顶点、边、颜色与相机配置
-│       ├── transform.py # MVP 矩阵（含双轴旋转）
-│       └── main.py     # 线框渲染与交互
+│   ├── Work1_pro/      # 3D 立方体线框渲染（选做拓展）
+│   │   ├── config.py   # 正方体顶点、边、颜色与相机配置
+│   │   ├── transform.py # MVP 矩阵（含双轴旋转）
+│   │   └── main.py     # 线框渲染与交互
+│   └── Work2/          # Bézier 曲线光栅化与交互绘制
+│       ├── config.py   # 窗口、采样数、对象池与颜色配置
+│       ├── bezier.py   # De Casteljau 算法、包络线、Spline 转换
+│       └── main.py     # GPU 光栅化内核与交互渲染
 ├── pyproject.toml
 └── README.md
 ```
