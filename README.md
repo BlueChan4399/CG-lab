@@ -28,6 +28,12 @@ Work1 的拓展，将几何图元升级为三维正方体，实现完整的 MVP 
 
 **操作：** `鼠标左键` 添加/拖拽控制点，`鼠标右键` 切换 Bézier/Spline 模式，`空格` 开关反走样，`C` 清空画布
 
+### Work3 - Phong & Blinn-Phong 光照模型
+
+基于 Taichi 实现了一个支持 GPU 加速的实时光线追踪渲染器。脱离了传统 CPU 循环与外部模型，在 Taichi Kernel 中利用数学隐式方程直接定义三维几何体，并实现了完整的局部光照模型。在完成基础的 Ambient、Diffuse 和 Specular 计算之上，搭建了现代化的 UI 交互面板，并完成了**硬阴影 (Hard Shadow)** 与 **Blinn-Phong 高光模型升级** 。
+
+**操作：** `鼠标左键` 拖动左上角 UI 面板的滑动条：`Ka` 调节环境光、 `Kd` 调节漫反射光、 `Ks` 调节镜面高光、`N` 调节高光指数，`Toggle Model` 切换 Phong/Blinn-Phong 模式
+
 ## 项目结构
 
 ```
@@ -45,10 +51,15 @@ CG-lab/
 │   │   ├── config.py   # 正方体顶点、边、颜色与相机配置
 │   │   ├── transform.py # MVP 矩阵（含双轴旋转）
 │   │   └── main.py     # 线框渲染与交互
-│   └── Work2/          # Bézier 曲线光栅化与交互绘制
-│       ├── config.py   # 窗口、采样数、对象池与颜色配置
-│       ├── bezier.py   # De Casteljau 算法、包络线、Spline 转换
-│       └── main.py     # GPU 光栅化内核与交互渲染
+│   ├── Work2/          # Bézier 曲线光栅化与交互绘制
+│   │   ├── config.py   # 窗口、采样数、对象池与颜色配置
+│   │   ├── bezier.py   # De Casteljau 算法、包络线、Spline 转换
+│   │   └── main.py     # GPU 光栅化内核与交互渲染
+│   └── Work3/          # Phong & Blinn-Phong 光照模型
+│       ├── config.py   # 场景配置（分辨率、相机、光源、物体几何参数与颜色、默认材质）
+│       ├── raytracer.py # 核心算法库（射线与球/圆锥/地面求交、法线梯度计算）
+│       └── main.py     # 渲染循环、阴影逻辑、UI 交互构建
 ├── pyproject.toml
 └── README.md
+
 ```
