@@ -34,6 +34,12 @@ Work1 的拓展，将几何图元升级为三维正方体，实现完整的 MVP 
 
 **操作：** `鼠标左键` 拖动左上角 UI 面板的滑动条：`Ka` 调节环境光、 `Kd` 调节漫反射光、 `Ks` 调节镜面高光、`N` 调节高光指数，`Toggle Model` 切换 Phong/Blinn-Phong 模式
 
+### Work4 - Whitted-Style 光线追踪（迭代式）
+
+将 Work3 的局部光照升级为完整的 **Whitted-Style 光线追踪**。在单个 Taichi Kernel 内用 `for` 循环 + `throughput`/`final_color` 方案替代传统递归，完美适配 GPU SIMT。场景包含黑白棋盘格无限大地面（漫反射）、红色漫反射球、银色镜面球，并完成了**硬阴影**与 **Shadow Acne 浮点偏移修正**。选做部分进一步加入了**玻璃球（Snell 折射 + TIR 全反射）**与 **MSAA 抗锯齿**。
+
+**操作：** `鼠标左键` 拖动右上角 UI 面板的滑动条：`Light X / Y / Z` 实时移动光源、`Max Bounces` 调节最大弹射次数（1~8）、`AA Samples` 调节 MSAA 每像素采样数（1~8）
+
 ## 项目结构
 
 ```
@@ -55,10 +61,14 @@ CG-lab/
 │   │   ├── config.py   # 窗口、采样数、对象池与颜色配置
 │   │   ├── bezier.py   # De Casteljau 算法、包络线、Spline 转换
 │   │   └── main.py     # GPU 光栅化内核与交互渲染
-│   └── Work3/          # Phong & Blinn-Phong 光照模型
-│       ├── config.py   # 场景配置（分辨率、相机、光源、物体几何参数与颜色、默认材质）
-│       ├── raytracer.py # 核心算法库（射线与球/圆锥/地面求交、法线梯度计算）
-│       └── main.py     # 渲染循环、阴影逻辑、UI 交互构建
+│   ├── Work3/          # Phong & Blinn-Phong 光照模型
+│   │   ├── config.py   # 场景配置（分辨率、相机、光源、物体几何参数与颜色、默认材质）
+│   │   ├── raytracer.py # 核心算法库（射线与球/圆锥/地面求交、法线梯度计算）
+│   │   └── main.py     # 渲染循环、阴影逻辑、UI 交互构建
+│   └── Work4/          # Whitted-Style 光线追踪（含折射 + MSAA 选做）
+│       ├── config.py   # 场景配置（分辨率、相机、光源、几何/材质、玻璃 IOR、UI 范围）
+│       ├── raytracer.py # 核心算法库（射线-球/平面求交、反射、Snell 折射、棋盘格采样）
+│       └── main.py     # 迭代弹射 Kernel、Phong+阴影着色、MSAA、UI 面板
 ├── pyproject.toml
 └── README.md
 
