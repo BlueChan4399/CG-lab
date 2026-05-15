@@ -40,6 +40,12 @@ Work1 的拓展，将几何图元升级为三维正方体，实现完整的 MVP 
 
 **操作：** `鼠标左键` 拖动右上角 UI 面板的滑动条：`Light X / Y / Z` 实时移动光源、`Max Bounces` 调节最大弹射次数（1~8）、`AA Samples` 调节 MSAA 每像素采样数（1~8）
 
+### Work5 - 可微渲染与三维网格形变
+
+基于 PyTorch3D 的可微渲染管线，利用多视角剪影作为监督信号，从零开始将单位球面（ico_sphere）形变为目标三维模型（奶牛）。使用 SoftSilhouetteShader 将光栅化边界软化，使剪影误差通过渲染管线反向传播回顶点坐标。通过 Laplacian Smoothing、Edge Loss 和 Normal Consistency 三大正则项保证网格表面光滑。选做部分扩展为形状 + 顶点颜色联合优化，使用 SoftPhong Shader 监督 RGB 渲染，输出带颜色的 .ply 文件。
+
+**操作：** 按顺序执行 `Work5.ipynb` 中的三个 Cell（环境安装 → 必做实验 → 选做实验），中间结果自动保存至 `output_meshes/` 和 `output_textured_meshes/`。
+
 ## 项目结构
 
 ```
@@ -65,10 +71,17 @@ CG-lab/
 │   │   ├── config.py   # 场景配置（分辨率、相机、光源、物体几何参数与颜色、默认材质）
 │   │   ├── raytracer.py # 核心算法库（射线与球/圆锥/地面求交、法线梯度计算）
 │   │   └── main.py     # 渲染循环、阴影逻辑、UI 交互构建
-│   └── Work4/          # Whitted-Style 光线追踪（含折射 + MSAA 选做）
+│   └── Work4/          # Whitted-Style 光线追踪（折射 + MSAA ）
 │       ├── config.py   # 场景配置（分辨率、相机、光源、几何/材质、玻璃 IOR、UI 范围）
 │       ├── raytracer.py # 核心算法库（射线-球/平面求交、反射、Snell 折射、棋盘格采样）
 │       └── main.py     # 迭代弹射 Kernel、Phong+阴影着色、MSAA、UI 面板
+│   └── Work5/          # 可微渲染与三维网格形变与纹理联合优化
+│       ├── data/       # 项目数据
+│       ├── output_meshes/ # 剪影驱动 mesh 形变的 .obj 中间结果
+|       ├── output_textured_meshes/ # 形状 + 纹理联合优化的 .ply 彩色中间结果
+|       ├── Work5.ipynb # 主实验 Notebook
+|       ├── visualization/ # 视觉三维演示结果
+|       └── README.md   # 项目说明文档
 ├── pyproject.toml
 └── README.md
 
