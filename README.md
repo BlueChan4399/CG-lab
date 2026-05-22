@@ -46,6 +46,12 @@ Work1 的拓展，将几何图元升级为三维正方体，实现完整的 MVP 
 
 **操作：** 按顺序执行 `Work5.ipynb` 中的三个 Cell（环境安装 → 必做实验 → 选做实验），中间结果自动保存至 `output_meshes/` 和 `output_textured_meshes/`。
 
+### Work6 - 质点-弹簧模型布料模拟
+
+基于 **质点-弹簧模型** 实现可交互的 3D 布料模拟。布料离散为 N×N 网格质点，相邻质点通过遵循胡克定律的弹簧相连，弹簧拓扑覆盖 **结构 (Structural) / 剪切 (Shear) / 弯曲 (Bending)** 三种类型。独立实现并对比三种经典数值积分方法 —— **显式欧拉**、**半隐式 / 辛欧拉** 与 **隐式欧拉（定点迭代）**，观察它们在同一物理系统下的稳定性差异。每个积分器把“受力计算”与“位置/速度更新”合并在同一个 `@ti.kernel` 内，最小化每帧 Kernel 启动次数。选做部分加入 **弹簧拓扑运行时开关**（独立切换 Shear / Bending 观察形态差异）与 **空间碰撞**，可实时拖动球体观察布料反应。
+
+**操作：** `鼠标右键` 拖拽旋转视角；控制面板：`[*] Explicit / Semi-Implicit / Implicit Euler` 切换积分方法，拖动 `Damping (k_d)` / `Stiffness (k_s)` 调节物理参数；选做版本（`optional.py`）额外含 `[*] Shear / Bending Springs` 拓扑开关、`[*] Pin 4 Corners` 钉点开关、`Sphere Y / Radius` 球体调节滑动条
+
 ## 项目结构
 
 ```
@@ -82,6 +88,15 @@ CG-lab/
 |       ├── Work5.ipynb # 主实验 Notebook
 |       ├── visualization/ # 视觉三维演示结果
 |       └── README.md   # 项目说明文档
+│   └── Work6/          # 质点-弹簧模型布料模拟与弹簧拓扑开关 + 球体碰撞
+│       ├── __init__.py # 子模块加载前 ti.init
+│       ├── config.py   # 常量配置
+│       ├── physics.py  # 仿真字段定义 + 力学 @ti.func
+│       ├── solver.py   # 三个 @ti.kernel 积分求解器 + 调度入口
+│       ├── main.py     # 初始化 Kernel + GGUI 控制面板与渲染主循环
+│       ├── optional.py # 选做：弹簧类型开关 + 球体碰撞
+│       ├── gif/        # 项目效果展示 gif
+│       └── README.md   # 项目说明文档
 ├── pyproject.toml
 └── README.md
 
