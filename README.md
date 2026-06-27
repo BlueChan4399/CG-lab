@@ -52,6 +52,12 @@ Work1 的拓展，将几何图元升级为三维正方体，实现完整的 MVP 
 
 **操作：** `鼠标右键` 拖拽旋转视角；控制面板：`[*] Explicit / Semi-Implicit / Implicit Euler` 切换积分方法，拖动 `Damping (k_d)` / `Stiffness (k_s)` 调节物理参数；选做版本（`optional.py`）额外含 `[*] Shear / Bending Springs` 拓扑开关、`[*] Pin 4 Corners` 钉点开关、`Sphere Y / Radius` 球体调节滑动条
 
+### Work7 - LBS 蒙皮
+
+基于 **SMPL** 参数化人体模型，手动拆解并复现完整的 **线性混合蒙皮（Linear Blend Skinning, LBS）** 流程：从模板网格 `v_template` 出发，依次完成 **形状校正**（`shapedirs` 线性组合 + `J_regressor` 关节回归）、**姿态校正**（轴角 → 旋转矩阵 → `posedirs` 修正 blend shape）与 **骨骼层级刚体变换 + 顶点权重混合**，并与 `smplx` 官方 `forward()` 做逐顶点对比，验证手写实现的平均/最大绝对误差均为 0。可视化覆盖单关节权重热力图、全关节主导权重分布，以及模板 / 形状 / 姿态 / 蒙皮四阶段对比图。选做部分实现一个**单关节姿态动画**：固定体型让左肘从 0° 平滑旋转到 110°，逐帧渲染并合成循环 GIF，直观观察蒙皮权重区域如何随骨骼运动被平滑带动。
+
+**操作：** 在 `Work7/` 目录下执行 `.venv\Scripts\python.exe main.py`，四阶段图、对比图、权重图、姿态动画 GIF 与摘要自动保存至 `outputs/`；可用 `--joint-id` / `--anim-joint-id` / `--anim-axis` / `--anim-angle` 等参数自定义（详见 `Work7/README.md`）
+
 ## 项目结构
 
 ```
@@ -96,6 +102,12 @@ CG-lab/
 │       ├── main.py     # 初始化 Kernel + GGUI 控制面板与渲染主循环
 │       ├── optional.py # 选做：弹簧类型开关 + 球体碰撞
 │       ├── gif/        # 项目效果展示 gif
+│       └── README.md   # 项目说明文档
+│   └── Work7/          # SMPL 参数化人体模型与线性混合蒙皮（LBS）
+│       ├── __init__.py 
+│       ├── main.py     # SMPL 加载、手写 LBS、四阶段可视化、误差验证与选做姿态动画
+│       ├── SMPL_NEUTRAL.pkl # 本地 SMPL neutral 模型（较大，已 gitignore，需自行放置）
+│       ├── outputs/    # 阶段图、对比图、权重图、pose_animation.gif 与 summary.txt
 │       └── README.md   # 项目说明文档
 ├── pyproject.toml
 └── README.md
