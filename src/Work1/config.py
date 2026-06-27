@@ -1,22 +1,8 @@
-import numpy as np
-
-# 窗口与显示
-WINDOW_RES = (700, 700)
-ASPECT_RATIO = WINDOW_RES[0] / WINDOW_RES[1]
-
-# 相机与投影
-EYE_POS = np.array([0.0, 0.0, 5.0], dtype=np.float32)
-EYE_FOV = 45.0
-Z_NEAR = 0.1
-Z_FAR = 50.0
-
-# 初始三角形顶点
-VERTICES = np.array([
-    [ 2.0,  0.0, -2.0, 1.0],
-    [ 0.0,  2.0, -2.0, 1.0],[-2.0,  0.0, -2.0, 1.0]
-], dtype=np.float32)
-
-# 颜色
-COLOR_GREEN = 0x00FF00
-COLOR_BLUE = 0x0000FF
-COLOR_RED = 0xFF0000
+# --- 物理系统参数 ---
+NUM_PARTICLES = 1000      # 粒子总数 (卡顿请调小此数值，如 2000)
+GRAVITY_STRENGTH = 0.001   # 鼠标引力强度
+DRAG_COEF = 0.98           # 空气阻力系数
+BOUNCE_COEF = -0.8         # 边界反弹能量损耗# --- 渲染系统参数 ---
+WINDOW_RES = (1200, 900)    # 窗口分辨率
+PARTICLE_RADIUS = 1.5      # 粒子绘制半径
+PARTICLE_COLOR = 0x00FF00  # 粒子颜色 (绿色)

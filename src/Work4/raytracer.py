@@ -1,9 +1,7 @@
 import taichi as ti
 
-
 @ti.func
 def ray_sphere_intersect(orig, dir, center, radius):
-    """射线-球求交（解二次方程）。返回 (hit, t)。"""
     oc = orig - center
     a = dir.dot(dir)
     b = 2.0 * oc.dot(dir)
@@ -15,18 +13,51 @@ def ray_sphere_intersect(orig, dir, center, radius):
         sqrt_disc = ti.math.sqrt(discriminant)
         t1 = (-b - sqrt_disc) / (2.0 * a)
         t2 = (-b + sqrt_disc) / (2.0 * a)
-        if t1 > 1e-4:
-            t = t1
-            hit = True
-        elif t2 > 1e-4:
-            t = t2
-            hit = True
+        if t1 > 1e-4: t = t1; hit = True
+        elif t2 > 1e-4: t = t2; hit = True
     return hit, t
 
+@ti.func
+def ray_cone_intersect(orig, dir, apex, base_y, radius):
+    hit = False
+    t = 1e20
+    h = apex.y - base_y
+    m = (radius / h) ** 2
+    co = orig - apex
+    
+    a = dir.x**2 + dir.z**2 - m * dir.y**2
+    b = 2.0 * (dir.x * co.x + dir.z * co.z - m * dir.y * co.y)
+    c = co.x**2 + co.z**2 - m * co.y**2
+    
+    if ti.abs(a) > 1e-6:  # 核心修复：防止阴影射线的方向导致除以 0
+        det = b*b - 4.0*a*c
+        if det >= 0.0:
+            sqrt_det = ti.math.sqrt(det)
+            t1 = (-b - sqrt_det) / (2.0 * a)
+            t2 = (-b + sqrt_det) / (2.0 * a)
+            
+            if t1 > 1e-4 and t1 < t:
+                p1 = orig + t1 * dir
+                if base_y <= p1.y <= apex.y:
+                    t = t1
+                    hit = True
+            if t2 > 1e-4 and t2 < t:
+                p2 = orig + t2 * dir
+                if base_y <= p2.y <= apex.y:
+                    t = t2
+                    hit = True
+
+    if ti.abs(dir.y) > 1e-6:
+        t_b = (base_y - orig.y) / dir.y
+        if t_b > 1e-4 and t_b < t:
+            p_b = orig + t_b * dir
+            if (p_b.x - apex.x)**2 + (p_b.z - apex.z)**2 <= radius**2:
+                t = t_b
+                hit = True
+    return hit, t
 
 @ti.func
 def ray_plane_intersect(orig, dir, plane_y):
-    """射线-水平无限大平面求交 (y = plane_y)。"""
     hit = False
     t = 1e20
     if ti.abs(dir.y) > 1e-6:
@@ -36,43 +67,14 @@ def ray_plane_intersect(orig, dir, plane_y):
             hit = True
     return hit, t
 
-
 @ti.func
-def reflect(I, N):
-    """理想镜面反射方向公式 R = I - 2(I·N)N。"""
-    return (I - 2.0 * I.dot(N) * N).normalized()
-
-
-@ti.func
-def refract(I, N, eta):
-    """选做：Snell's Law 折射方向。
-    参数:
-        I    - 入射方向（单位向量，朝向表面）
-        N    - 表面外法线（指向 I 的来源一侧）
-        eta  - n_in / n_out （从入射介质到出射介质的相对折射率）
-    返回:
-        (refr_dir, tir)
-        refr_dir - 折射方向（仅在 tir=False 时有效）
-        tir      - 是否发生全反射（Total Internal Reflection）
-    """
-    cos_i = -I.dot(N)
-    k = 1.0 - eta * eta * (1.0 - cos_i * cos_i)
-    refr = ti.math.vec3(0.0, 0.0, 0.0)
-    tir = False
-    if k < 0.0:
-        tir = True
+def get_cone_normal(p, apex, base_y, radius):
+    n = ti.math.vec3(0.0)
+    if p.y <= base_y + 1e-3:
+        n = ti.math.vec3(0.0, -1.0, 0.0)
     else:
-        refr = (eta * I + (eta * cos_i - ti.math.sqrt(k)) * N).normalized()
-    return refr, tir
-
-
-@ti.func
-def checker_color(p, color_a, color_b):
-    """通过交点 x、z 坐标的奇偶性判断棋盘格颜色。"""
-    cx = ti.floor(p.x)
-    cz = ti.floor(p.z)
-    parity = (ti.cast(cx, ti.i32) + ti.cast(cz, ti.i32)) % 2
-    out = color_a
-    if parity != 0:
-        out = color_b
-    return out
+        h = apex.y - base_y
+        m = (radius / h) ** 2
+        n = ti.math.vec3(p.x - apex.x, -m * (p.y - apex.y), p.z - apex.z)
+        n = n.normalized()
+    return n

@@ -1,2 +1,3 @@
-"""Work7: SMPL linear blend skinning visualization."""
+import taichi as ti
 
+ti.init(arch=ti.gpu)

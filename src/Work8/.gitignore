@@ -1,0 +1,9 @@
+.venv/
+.pip-cache/
+.tmp/
+.matplotlib/
+__pycache__/
+*.py[oc]
+
+# SMPL 模型文件较大（约 236MB，超过 GitHub 单文件 100MB 限制），不入库，请按 README 自行放置
+*.pkl

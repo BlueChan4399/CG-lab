@@ -1,22 +1,22 @@
 import numpy as np
 
-# 窗口与光栅化分辨率
-WINDOW_RES = (1024, 1024)
+# 窗口与显示
+WINDOW_RES = (700, 700)
+ASPECT_RATIO = WINDOW_RES[0] / WINDOW_RES[1]
 
-# 最大控制点数量
-MAX_CONTROL_POINTS = 100
+# 相机与投影
+EYE_POS = np.array([0.0, 0.0, 5.0], dtype=np.float32)
+EYE_FOV = 45.0
+Z_NEAR = 0.1
+Z_FAR = 50.0
 
-# Bézier 曲线采样点数
-NUM_SAMPLES = 1000
+# 初始三角形顶点
+VERTICES = np.array([
+    [ 2.0,  0.0, -2.0, 1.0],
+    [ 0.0,  2.0, -2.0, 1.0],[-2.0,  0.0, -2.0, 1.0]
+], dtype=np.float32)
 
-# 反走样与动画
-AA_SCALE = 2
-NUM_SAMPLES_SPLINE = 500
-ENVELOPE_SPEED = 0.005
-DRAG_RADIUS = 15.0
-
-# 颜色配置
-COLOR_POLY = 0x808080     # 多边形（灰）
-COLOR_POINT = 0x0000FF    # 控制点（蓝）
-COLOR_ENVELOPE = 0x00FF00 # 包络线（绿）
-COLOR_CURVE_POINT = 0xFF0000  # 包络动画尖端点（红）
+# 颜色
+COLOR_GREEN = 0x00FF00
+COLOR_BLUE = 0x0000FF
+COLOR_RED = 0xFF0000
